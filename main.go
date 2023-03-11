@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 )
@@ -34,6 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Create a struct to hold the json
 	var swirlConfig SwirlConfig
 
 	// Marshal json to a struct
@@ -47,21 +47,6 @@ func main() {
 	for _, app := range swirlConfig.Applications {
 		// Print app name
 		fmt.Printf("\n%s\n", strings.ToUpper(app.Name))
-
-		// Change background color
-		background_commands := app.Background[background]
-
-		for _, command := range background_commands {
-			fmt.Println(command)
-
-			// Form command with executable and the arguments
-			cmd := exec.Command(command[0], command...)
-			err := cmd.Run()
-
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
 	}
 }
 
@@ -72,8 +57,7 @@ type SwirlConfig struct {
 }
 
 type Application struct {
-	Name       string                 `json:"name"`
-	Variables  map[string]interface{} `json:"variables"`
-	Background map[string][][]string  `json:"background"`
-	Theme      map[string][][]string  `json:"theme"`
+	Name               string                 `json:"name"`
+	Variables          map[string]interface{} `json:"variables"`
+	BackgroundCommands map[string][]string    `json:"background_commands"`
 }
