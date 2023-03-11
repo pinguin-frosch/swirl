@@ -55,7 +55,14 @@ func main() {
 		// Command and arguments to run
 		var cmdArgs []string
 
-		// Print commands for the background
+		// Change theme color
+		for _, command := range app.ThemeCommmands[theme] {
+			command = replaceVariables(command, variables)
+			cmdArgs = parseCommandString(command)
+			runCommand(cmdArgs)
+		}
+
+		// Change backgrund color
 		for _, command := range app.BackgroundCommands[background] {
 			command = replaceVariables(command, variables)
 			cmdArgs = parseCommandString(command)
@@ -74,6 +81,7 @@ type Application struct {
 	Name               string              `json:"name"`
 	Variables          map[string]string   `json:"variables"`
 	BackgroundCommands map[string][]string `json:"background_commands"`
+	ThemeCommmands     map[string][]string `json:"theme_commands"`
 }
 
 func runCommand(cmdArgs []string) {
