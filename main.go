@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 )
@@ -42,22 +43,23 @@ func main() {
 	theme := swirlConfig.Theme
 	background := swirlConfig.Background
 
-	fmt.Printf("Changing theme to %s using %s background.\n", theme, background)
+	fmt.Printf("Changing theme to %s using %s background.\n\n", theme, background)
 
 	for _, app := range swirlConfig.Applications {
 		name := app.Name
 		variables := app.Variables
 
 		// Print app name
-		fmt.Printf("\n%s\n", strings.ToUpper(name))
+		fmt.Printf("%s\n", strings.ToUpper(name))
 
 		// Command and arguments to run
-		// var cmdArgs []string
+		var cmdArgs []string
 
 		// Print commands for the background
 		for _, command := range app.BackgroundCommands[background] {
 			command = replaceVariables(command, variables)
-			// cmdArgs = parseCommandString(command)
+			cmdArgs = parseCommandString(command)
+			runCommand(cmdArgs)
 		}
 	}
 }
@@ -74,11 +76,20 @@ type Application struct {
 	BackgroundCommands map[string][]string `json:"background_commands"`
 }
 
+func runCommand(cmdArgs []string) {
+	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+	cmd.Run()
+}
+
 func replaceVariables(cmdString string, variables map[string]string) string {
 	// Loop over variables map and replace them in the cmdString
 	for key := range variables {
 		cmdString = strings.ReplaceAll(cmdString, "%"+key+"%", variables[key])
 	}
+
+	// Change ~ for the actual home directory
+	homeDir, _ := os.UserHomeDir()
+	cmdString = strings.ReplaceAll(cmdString, "~", homeDir)
 
 	return cmdString
 }
