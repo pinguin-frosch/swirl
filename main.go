@@ -47,6 +47,18 @@ func main() {
 	for _, app := range swirlConfig.Applications {
 		// Print app name
 		fmt.Printf("\n%s\n", strings.ToUpper(app.Name))
+
+		// Command and arguments to run
+		var cmdArgs []string
+
+		// Print commands for the background
+		for _, command := range app.BackgroundCommands[background] {
+			cmdArgs = parseCommandString(command)
+
+			for _, x := range cmdArgs {
+				fmt.Println(x)
+			}
+		}
 	}
 }
 
@@ -60,4 +72,34 @@ type Application struct {
 	Name               string                 `json:"name"`
 	Variables          map[string]interface{} `json:"variables"`
 	BackgroundCommands map[string][]string    `json:"background_commands"`
+}
+
+func parseCommandString(cmdString string) []string {
+	// Array of string slices to hold the command and args
+	cmdArgs := []string{}
+	quote := false
+	arg := ""
+
+	for _, c := range cmdString {
+		// Keep track of " to allow spaces in args
+		if c == '"' {
+			quote = !quote
+		} else if c == ' ' && !quote {
+			// Append to the cmd args and reset the arg
+			if arg != "" {
+				cmdArgs = append(cmdArgs, arg)
+			}
+			arg = ""
+		} else {
+			// Keep adding to arg until the above conditions met
+			arg += string(c)
+		}
+	}
+
+	if arg != "" {
+		// Add the remaining arg is exists
+		cmdArgs = append(cmdArgs, arg)
+	}
+
+	return cmdArgs
 }
