@@ -45,19 +45,19 @@ func main() {
 	fmt.Printf("Changing theme to %s using %s background.\n", theme, background)
 
 	for _, app := range swirlConfig.Applications {
+		name := app.Name
+		variables := app.Variables
+
 		// Print app name
-		fmt.Printf("\n%s\n", strings.ToUpper(app.Name))
+		fmt.Printf("\n%s\n", strings.ToUpper(name))
 
 		// Command and arguments to run
-		var cmdArgs []string
+		// var cmdArgs []string
 
 		// Print commands for the background
 		for _, command := range app.BackgroundCommands[background] {
-			cmdArgs = parseCommandString(command)
-
-			for _, x := range cmdArgs {
-				fmt.Println(x)
-			}
+			command = replaceVariables(command, variables)
+			// cmdArgs = parseCommandString(command)
 		}
 	}
 }
@@ -69,9 +69,18 @@ type SwirlConfig struct {
 }
 
 type Application struct {
-	Name               string                 `json:"name"`
-	Variables          map[string]interface{} `json:"variables"`
-	BackgroundCommands map[string][]string    `json:"background_commands"`
+	Name               string              `json:"name"`
+	Variables          map[string]string   `json:"variables"`
+	BackgroundCommands map[string][]string `json:"background_commands"`
+}
+
+func replaceVariables(cmdString string, variables map[string]string) string {
+	// Loop over variables map and replace them in the cmdString
+	for key := range variables {
+		cmdString = strings.ReplaceAll(cmdString, "%"+key+"%", variables[key])
+	}
+
+	return cmdString
 }
 
 func parseCommandString(cmdString string) []string {
