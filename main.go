@@ -40,9 +40,10 @@ func main() {
 	// Marshal json to a struct
 	json.Unmarshal(byteResult, &swirlConfig)
 
-	theme := swirlConfig.Theme
-	background := swirlConfig.Background
-	swirlVariables := map[string]string{"theme": theme, "background": background}
+	// Get the variables from the config
+	swirlVariables := swirlConfig.Variables
+	theme := swirlVariables.Theme
+	background := swirlVariables.Background
 
 	fmt.Printf("Changing theme to %s using %s background.\n\n", theme, background)
 
@@ -51,9 +52,8 @@ func main() {
 		variables := app.Variables
 
 		// Add swirl variables to the current app
-		for key, value := range swirlVariables {
-			variables[key] = value
-		}
+		variables["theme"] = theme
+		variables["background"] = background
 
 		// Print app name
 		fmt.Printf("%s\n", strings.ToUpper(name))
@@ -78,9 +78,13 @@ func main() {
 }
 
 type SwirlConfig struct {
-	Theme        string        `json:"theme"`
-	Background   string        `json:"background"`
-	Applications []Application `json:"applications"`
+	Variables    SwirlVariables `json:"variables"`
+	Applications []Application  `json:"applications"`
+}
+
+type SwirlVariables struct {
+	Theme      string `json:"theme"`
+	Background string `json:"background"`
 }
 
 type Application struct {
