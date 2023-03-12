@@ -42,12 +42,18 @@ func main() {
 
 	theme := swirlConfig.Theme
 	background := swirlConfig.Background
+	swirlVariables := map[string]string{"theme": theme, "background": background}
 
 	fmt.Printf("Changing theme to %s using %s background.\n\n", theme, background)
 
 	for _, app := range swirlConfig.Applications {
 		name := app.Name
 		variables := app.Variables
+
+		// Add swirl variables to the current app
+		for key, value := range swirlVariables {
+			variables[key] = value
+		}
 
 		// Print app name
 		fmt.Printf("%s\n", strings.ToUpper(name))
@@ -91,8 +97,22 @@ func runCommand(cmdArgs []string) {
 
 func replaceVariables(cmdString string, variables map[string]string) string {
 	// Loop over variables map and replace them in the cmdString
-	for key := range variables {
-		cmdString = strings.ReplaceAll(cmdString, "%"+key+"%", variables[key])
+	for {
+		replaced := false
+
+		// Loop over every key and replace if exists in cmdString
+		for key := range variables {
+			placeholder := "%" + key + "%"
+			if strings.Contains(cmdString, placeholder) {
+				cmdString = strings.ReplaceAll(cmdString, placeholder, variables[key])
+				replaced = true
+			}
+		}
+
+		// Exit if there was not any replacement
+		if !replaced {
+			break
+		}
 	}
 
 	// Change ~ for the actual home directory
@@ -106,12 +126,22 @@ func parseCommandString(cmdString string) []string {
 	// Array of string slices to hold the command and args
 	cmdArgs := []string{}
 	quote := false
+	quoteChar := rune(0)
 	arg := ""
 
 	for _, c := range cmdString {
-		// Keep track of " to allow spaces in args
-		if c == '"' {
-			quote = !quote
+		// Keep track of " and ' to allow spaces in args
+		if c == '"' || c == '\'' {
+			if quote && c == quoteChar {
+				quote = false
+				quoteChar = rune(0)
+			} else if !quote {
+				quote = true
+				quoteChar = c
+			} else {
+				// Keep everything inside the current quote
+				arg += string(c)
+			}
 		} else if c == ' ' && !quote {
 			// Append to the cmd args and reset the arg
 			if arg != "" {
