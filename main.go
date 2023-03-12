@@ -54,6 +54,15 @@ func main() {
 	// Get the variables from the config
 	swirlVariables := swirlConfig.Variables
 
+	// Toggle dark and light theme if no commands are provided
+	if theme == "" && background == "" {
+		if swirlVariables.Background == "dark" {
+			background = "light"
+		} else {
+			background = "dark"
+		}
+	}
+
 	// Use config values if not provided in the command line
 	if theme == "" {
 		theme = swirlVariables.Theme
