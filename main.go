@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -16,6 +18,15 @@ var configFile string = path.Join(os.Getenv("HOME"), ".config", "swirl", "config
 
 func main() {
 	fmt.Println("========================= Swirl =========================")
+
+	// Define command line arguments
+	var theme string
+	var background string
+	flag.StringVar(&theme, "theme", "", "Theme to use")
+	flag.StringVar(&background, "background", "", "Background to use")
+
+	// Parse command line arguments
+	flag.Parse()
 
 	// Read config file
 	file, err := os.Open(configFile)
@@ -42,8 +53,28 @@ func main() {
 
 	// Get the variables from the config
 	swirlVariables := swirlConfig.Variables
-	theme := swirlVariables.Theme
-	background := swirlVariables.Background
+
+	// Use config values if not provided in the command line
+	if theme == "" {
+		theme = swirlVariables.Theme
+	}
+	if background == "" {
+		background = swirlVariables.Background
+	}
+
+	// Update config
+	swirlConfig.Variables.Theme = theme
+	swirlConfig.Variables.Background = background
+
+	// Save config after changing the theme and background
+	data, err := json.MarshalIndent(swirlConfig, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	err = ioutil.WriteFile(configFile, data, 0644)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("Changing theme to %s using %s background.\n\n", theme, background)
 
