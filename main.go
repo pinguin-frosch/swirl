@@ -118,8 +118,9 @@ func main() {
 }
 
 type SwirlConfig struct {
-	Variables    SwirlVariables `json:"variables"`
-	Applications []Application  `json:"applications"`
+	Variables  SwirlVariables `json:"variables"`
+	Background []Application  `json:"background"`
+	Theme      []Application  `json:"theme"`
 }
 
 type SwirlVariables struct {
@@ -128,10 +129,9 @@ type SwirlVariables struct {
 }
 
 type Application struct {
-	Name               string              `json:"name"`
-	Variables          map[string]string   `json:"variables"`
-	BackgroundCommands map[string][]string `json:"background_commands"`
-	ThemeCommmands     map[string][]string `json:"theme_commands"`
+	Name      string            `json:"name"`
+	Variables map[string]string `json:"variables"`
+	Commands  []string          `json:"commands"`
 }
 
 func runCommand(cmdArgs []string) {
