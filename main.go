@@ -99,7 +99,7 @@ func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message 
 
 	for _, app := range apps {
 		name := app.Name
-		variables := app.Variables
+		variables := swirlVariables.Applications[name]
 
 		// Add swirl variables to the current app
 		variables["theme"] = (*swirlVariables).Theme
@@ -127,14 +127,14 @@ type SwirlConfig struct {
 }
 
 type SwirlVariables struct {
-	Theme      string `json:"theme"`
-	Background string `json:"background"`
+	Theme        string                       `json:"theme"`
+	Background   string                       `json:"background"`
+	Applications map[string]map[string]string `json:"applications"`
 }
 
 type Application struct {
-	Name      string            `json:"name"`
-	Variables map[string]string `json:"variables"`
-	Commands  []string          `json:"commands"`
+	Name     string   `json:"name"`
+	Commands []string `json:"commands"`
 }
 
 func runCommand(cmdArgs []string) {
