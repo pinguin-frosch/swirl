@@ -85,31 +85,34 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Changing theme to %s using %s background.\n\n", theme, background)
+	// Run commands
+	runAppCommands(swirlConfig.Theme, &swirlConfig.Variables, "Changing theme...")
+	runAppCommands(swirlConfig.Background, &swirlConfig.Variables, "Changing background...")
+}
 
-	for _, app := range swirlConfig.Applications {
+func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message string) {
+	if len(apps) == 0 {
+		return
+	}
+
+	fmt.Printf("\n%s\n", message)
+
+	for _, app := range apps {
 		name := app.Name
 		variables := app.Variables
 
 		// Add swirl variables to the current app
-		variables["theme"] = theme
-		variables["background"] = background
+		variables["theme"] = (*swirlVariables).Theme
+		variables["background"] = (*swirlVariables).Background
 
 		// Print app name
-		fmt.Printf("%s\n", strings.ToUpper(name))
+		fmt.Printf("%s\n", strings.ToLower(name))
 
 		// Command and arguments to run
 		var cmdArgs []string
 
-		// Change theme color
-		for _, command := range app.ThemeCommmands[theme] {
-			command = replaceVariables(command, variables)
-			cmdArgs = parseCommandString(command)
-			runCommand(cmdArgs)
-		}
-
-		// Change backgrund color
-		for _, command := range app.BackgroundCommands[background] {
+		// Parse commands and run them
+		for _, command := range app.Commands {
 			command = replaceVariables(command, variables)
 			cmdArgs = parseCommandString(command)
 			runCommand(cmdArgs)
