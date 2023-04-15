@@ -118,7 +118,7 @@ func parseCommandArgs() map[string]string {
 	for i, arg := range rawArgs {
 		if strings.HasPrefix(arg, "-") && i < len(rawArgs)-1 {
 			if !strings.HasPrefix(rawArgs[i+1], "-") {
-				parsedArgs[arg] = rawArgs[i+1]
+				parsedArgs[strings.TrimPrefix(arg, "-")] = rawArgs[i+1]
 			}
 		}
 	}
