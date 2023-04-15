@@ -110,3 +110,18 @@ func parseCommandString(cmdString string) []string {
 
 	return cmdArgs
 }
+
+func parseCommandArgs() map[string]string {
+	rawArgs := os.Args[1:]
+	parsedArgs := make(map[string]string)
+
+	for i, arg := range rawArgs {
+		if strings.HasPrefix(arg, "-") && i < len(rawArgs)-1 {
+			if !strings.HasPrefix(rawArgs[i+1], "-") {
+				parsedArgs[arg] = rawArgs[i+1]
+			}
+		}
+	}
+
+	return parsedArgs
+}
