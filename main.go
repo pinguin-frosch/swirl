@@ -22,8 +22,10 @@ func main() {
 	// Define command line arguments
 	var theme string
 	var background string
+	var keyboard string
 	flag.StringVar(&theme, "theme", "", "Theme to use")
 	flag.StringVar(&background, "background", "", "Background to use")
+	flag.StringVar(&keyboard, "keyboard", "", "Keyboard layout to use")
 
 	// Parse command line arguments
 	flag.Parse()
@@ -55,7 +57,7 @@ func main() {
 	swirlVariables := swirlConfig.Variables
 
 	// Toggle dark and light theme if no commands are provided
-	if theme == "" && background == "" {
+	if flag.NFlag() == 0 {
 		if swirlVariables.Background == "dark" {
 			background = "light"
 		} else {
@@ -70,10 +72,14 @@ func main() {
 	if background == "" {
 		background = swirlVariables.Background
 	}
+	if keyboard == "" {
+		keyboard = swirlVariables.Keyboard
+	}
 
 	// Update config
 	swirlConfig.Variables.Theme = theme
 	swirlConfig.Variables.Background = background
+	swirlConfig.Variables.Keyboard = keyboard
 
 	// Save config after changing the theme and background
 	data, err := json.MarshalIndent(swirlConfig, "", "  ")
@@ -88,6 +94,7 @@ func main() {
 	// Run commands
 	runAppCommands(swirlConfig.Theme, &swirlConfig.Variables, "Changing theme...")
 	runAppCommands(swirlConfig.Background, &swirlConfig.Variables, "Changing background...")
+	runAppCommands(swirlConfig.Keyboard, &swirlConfig.Variables, "Changing keyboard layout...")
 }
 
 func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message string) {
@@ -104,6 +111,7 @@ func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message 
 		// Add swirl variables to the current app
 		variables["theme"] = (*swirlVariables).Theme
 		variables["background"] = (*swirlVariables).Background
+		variables["keyboard"] = (*swirlVariables).Keyboard
 
 		// Print app name
 		fmt.Printf("%s\n", strings.ToLower(name))
@@ -124,11 +132,13 @@ type SwirlConfig struct {
 	Variables  SwirlVariables `json:"variables"`
 	Background []Application  `json:"background"`
 	Theme      []Application  `json:"theme"`
+	Keyboard   []Application  `json:"keyboard"`
 }
 
 type SwirlVariables struct {
 	Theme        string                       `json:"theme"`
 	Background   string                       `json:"background"`
+	Keyboard     string                       `json:"keyboard"`
 	Applications map[string]map[string]string `json:"applications"`
 }
 
