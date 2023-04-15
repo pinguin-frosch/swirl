@@ -23,11 +23,10 @@ func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message 
 		name := app.Name
 		variables := swirlVariables.Applications[name]
 
-		// Add swirl variables to the current app
-		variables["theme"] = (*swirlVariables).Theme
-		variables["background"] = (*swirlVariables).Background
-		variables["keyboard"] = (*swirlVariables).Keyboard
-		variables["taskbar"] = (*swirlVariables).Taskbar
+		// Add global variables to the current app
+		for k, v := range swirlVariables.Global {
+			variables[k] = v
+		}
 
 		// Print app name
 		fmt.Printf("%s\n", strings.ToLower(name))

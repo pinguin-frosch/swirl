@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -17,18 +16,8 @@ var configFile string = path.Join(os.Getenv("HOME"), ".config", "swirl", "config
 func main() {
 	fmt.Println("========================= Swirl =========================")
 
-	// Define command line arguments
-	var theme string
-	var background string
-	var keyboard string
-	var taskbar string
-	flag.StringVar(&theme, "theme", "", "Theme to use")
-	flag.StringVar(&background, "background", "", "Background to use")
-	flag.StringVar(&keyboard, "keyboard", "", "Keyboard layout to use")
-	flag.StringVar(&taskbar, "taskbar", "", "Taskbar to use")
-
 	// Parse command line arguments
-	flag.Parse()
+	args := parseCommandArgs()
 
 	// Read config file
 	file, err := os.Open(configFile)
@@ -54,38 +43,18 @@ func main() {
 	json.Unmarshal(byteResult, &swirlConfig)
 
 	// Get the variables from the config
-	swirlVariables := swirlConfig.Variables
+	globalVariables := &swirlConfig.Variables.Global
 
-	// Toggle dark and light theme if no commands are provided
-	if flag.NFlag() == 0 {
-		if swirlVariables.Background == "dark" {
-			background = "light"
+	// Update config
+	for k, v := range args {
+		if _, ok := (*globalVariables)[k]; ok {
+			(*globalVariables)[k] = v
 		} else {
-			background = "dark"
+			delete(args, k)
 		}
 	}
 
-	// Use config values if not provided in the command line
-	if theme == "" {
-		theme = swirlVariables.Theme
-	}
-	if background == "" {
-		background = swirlVariables.Background
-	}
-	if keyboard == "" {
-		keyboard = swirlVariables.Keyboard
-	}
-	if taskbar == "" {
-		taskbar = swirlVariables.Taskbar
-	}
-
-	// Update config
-	swirlConfig.Variables.Theme = theme
-	swirlConfig.Variables.Background = background
-	swirlConfig.Variables.Keyboard = keyboard
-	swirlConfig.Variables.Taskbar = taskbar
-
-	// Save config after changing the theme and background
+	// Save config after updating it
 	data, err := json.MarshalIndent(swirlConfig, "", "  ")
 	if err != nil {
 		panic(err)
@@ -96,8 +65,7 @@ func main() {
 	}
 
 	// Run commands
-	runAppCommands(swirlConfig.Theme, &swirlConfig.Variables, "Changing theme...")
-	runAppCommands(swirlConfig.Background, &swirlConfig.Variables, "Changing background...")
-	runAppCommands(swirlConfig.Keyboard, &swirlConfig.Variables, "Changing keyboard layout...")
-	runAppCommands(swirlConfig.Taskbar, &swirlConfig.Variables, "Changing taskbar...")
+	for k := range args {
+		runAppCommands(swirlConfig.Commands[k], &swirlConfig.Variables, fmt.Sprintf("Changing %s", k))
+	}
 }
