@@ -21,9 +21,11 @@ func main() {
 	var theme string
 	var background string
 	var keyboard string
+	var taskbar string
 	flag.StringVar(&theme, "theme", "", "Theme to use")
 	flag.StringVar(&background, "background", "", "Background to use")
 	flag.StringVar(&keyboard, "keyboard", "", "Keyboard layout to use")
+	flag.StringVar(&taskbar, "taskbar", "", "Taskbar to use")
 
 	// Parse command line arguments
 	flag.Parse()
@@ -73,11 +75,15 @@ func main() {
 	if keyboard == "" {
 		keyboard = swirlVariables.Keyboard
 	}
+	if taskbar == "" {
+		taskbar = swirlVariables.Taskbar
+	}
 
 	// Update config
 	swirlConfig.Variables.Theme = theme
 	swirlConfig.Variables.Background = background
 	swirlConfig.Variables.Keyboard = keyboard
+	swirlConfig.Variables.Taskbar = taskbar
 
 	// Save config after changing the theme and background
 	data, err := json.MarshalIndent(swirlConfig, "", "  ")
@@ -93,4 +99,5 @@ func main() {
 	runAppCommands(swirlConfig.Theme, &swirlConfig.Variables, "Changing theme...")
 	runAppCommands(swirlConfig.Background, &swirlConfig.Variables, "Changing background...")
 	runAppCommands(swirlConfig.Keyboard, &swirlConfig.Variables, "Changing keyboard layout...")
+	runAppCommands(swirlConfig.Taskbar, &swirlConfig.Variables, "Changing taskbar...")
 }

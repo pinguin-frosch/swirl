@@ -27,6 +27,7 @@ func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message 
 		variables["theme"] = (*swirlVariables).Theme
 		variables["background"] = (*swirlVariables).Background
 		variables["keyboard"] = (*swirlVariables).Keyboard
+		variables["taskbar"] = (*swirlVariables).Taskbar
 
 		// Print app name
 		fmt.Printf("%s\n", strings.ToLower(name))
