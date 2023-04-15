@@ -45,6 +45,17 @@ func main() {
 	// Get the variables from the config
 	globalVariables := &swirlConfig.Variables.Global
 
+	// Invert background when no args are provided
+	if len(args) == 0 {
+		if background, ok := (*globalVariables)["background"]; ok {
+			if background == "dark" {
+				args["background"] = "light"
+			} else {
+				args["background"] = "dark"
+			}
+		}
+	}
+
 	// Update config
 	for k, v := range args {
 		if _, ok := (*globalVariables)[k]; ok {
