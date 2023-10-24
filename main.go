@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path"
@@ -19,27 +18,17 @@ func main() {
 	args := parseCommandArgs()
 
 	// Read config file
-	file, err := os.Open(configFile)
-
+	file, err := os.ReadFile(configFile)
 	if err != nil {
 		log.Fatal(err)
 		return
-	}
-
-	// Close file when exiting
-	defer file.Close()
-
-	byteResult, err := io.ReadAll(file)
-
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	// Create a struct to hold the json
 	var swirlConfig SwirlConfig
 
 	// Marshal json to a struct
-	json.Unmarshal(byteResult, &swirlConfig)
+	json.Unmarshal(file, &swirlConfig)
 
 	// Get the variables from the config
 	globalVariables := &swirlConfig.Variables.Global
@@ -67,11 +56,11 @@ func main() {
 	// Save config after updating it
 	data, err := json.MarshalIndent(swirlConfig, "", "  ")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	err = os.WriteFile(configFile, data, 0644)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// Run commands
