@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -70,7 +69,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile(configFile, data, 0644)
+	err = os.WriteFile(configFile, data, 0644)
 	if err != nil {
 		panic(err)
 	}
