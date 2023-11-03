@@ -43,7 +43,7 @@ func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message 
 	}
 }
 
-func replaceVariables(cmdString string, variables map[string]string) string {
+func replaceVariables(cmdString string, variables map[string]interface{}) string {
 	// Loop over variables map and replace them in the cmdString
 	for {
 		replaced := false
@@ -52,7 +52,11 @@ func replaceVariables(cmdString string, variables map[string]string) string {
 		for key := range variables {
 			placeholder := "%" + key + "%"
 			if strings.Contains(cmdString, placeholder) {
-				cmdString = strings.ReplaceAll(cmdString, placeholder, variables[key])
+				variable, ok := variables[key].(string)
+				if !ok {
+					continue
+				}
+				cmdString = strings.ReplaceAll(cmdString, placeholder, variable)
 				replaced = true
 			}
 		}

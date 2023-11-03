@@ -6,9 +6,11 @@ type SwirlConfig struct {
 }
 
 type SwirlVariables struct {
-	Global       map[string]string            `json:"global"`
-	Applications map[string]map[string]string `json:"applications"`
+	Global       map[string]string   `json:"global"`
+	Applications map[string]Variable `json:"applications"`
 }
+
+type Variable map[string]interface{}
 
 type Application struct {
 	Name     string   `json:"name"`
