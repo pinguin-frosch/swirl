@@ -72,7 +72,15 @@ func findDotVariables(cmdString string) []string {
 
 func isValidVariable(variable string) bool {
 	length := len(variable)
-	return length >= 2 && strings.Contains(variable, ".") && variable[1] != '.' && variable[length-2] != '.'
+	if length < 2 || !strings.Contains(variable, ".") || variable[1] == '.' || variable[length-2] == '.' {
+		return false
+	}
+	for i := 1; i < len(variable); i++ {
+		if variable[i] == '.' && variable[i-1] == '.' {
+			return false
+		}
+	}
+	return true
 }
 
 func isValidKey(c rune) bool {

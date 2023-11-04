@@ -77,12 +77,12 @@ func TestFindDotVariables(t *testing.T) {
 		t.Fatalf("Got error: %v\n", err)
 	}
 
-	pattern := "sed -i \"s|\\(wezterm\\.font('\\).*')|\\1%fonts.%font%%')|\" %__.% %2 %%%3 %path% %very.long.path.to.annoy%"
+	pattern := "sed %a..b% -i \"s|\\(wezterm\\.font('\\).*')|\\1%fonts.%font%%')|\" %__.% %2 %%%3 %path% %very.long.path.to.annoy%"
 	pattern = replaceVariables(pattern, variables)
 	toReplace := findDotVariables(pattern)
 
 	if len(toReplace) != 2 {
-		t.Fatalf("Expected 2 dotVariables for %v", pattern)
+		t.Fatalf("Expected 2 dotVariables, but got: %v", len(toReplace))
 	}
 	expected := []string{"%fonts.iosevka%", "%very.long.path.to.annoy%"}
 	for k, v := range toReplace {
