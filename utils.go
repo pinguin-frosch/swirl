@@ -36,7 +36,7 @@ func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message 
 
 		// Parse commands and run them
 		for _, command := range app.Commands {
-			command = replacePercentVariables(command, variables)
+			command = replaceVariables(command, variables)
 			cmdArgs = parseCommandString(command)
 			runCommand(cmdArgs)
 		}
@@ -102,7 +102,7 @@ func isValidKey(c rune) bool {
 	return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_' || c == '.'
 }
 
-func replacePercentVariables(cmdString string, variables map[string]interface{}) string {
+func replacePercentVariables(cmdString string, variables Variable) string {
 	// Loop over variables map and replace them in the cmdString
 	for {
 		replaced := false
