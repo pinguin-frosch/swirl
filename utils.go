@@ -43,6 +43,42 @@ func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message 
 	}
 }
 
+// Finds the chuncks in the cmd that have valid dot variables.
+func findDotVariables(cmdString string) []string {
+	variables := make([]string, 0)
+
+	variable := ""
+	inPercent := false
+	for _, c := range cmdString {
+		if c == '%' {
+			variable += string(c)
+			if inPercent {
+				if isValidVariable(variable) {
+					variables = append(variables, variable)
+				}
+				variable = ""
+			}
+			inPercent = !inPercent
+		} else if isValidKey(c) && inPercent {
+			variable += string(c)
+		} else {
+			inPercent = false
+			variable = ""
+		}
+	}
+
+	return variables
+}
+
+func isValidVariable(variable string) bool {
+	length := len(variable)
+	return length >= 2 && strings.Contains(variable, ".") && variable[1] != '.' && variable[length-2] != '.'
+}
+
+func isValidKey(c rune) bool {
+	return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_' || c == '.'
+}
+
 func replaceVariables(cmdString string, variables map[string]interface{}) string {
 	// Loop over variables map and replace them in the cmdString
 	for {
