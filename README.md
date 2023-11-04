@@ -4,7 +4,7 @@ por cada aplicación para controlar tu sistema como desees.  Personalmente lo
 que más uso es el cambio de tema y fondo, aunque tengo scripts para cambiar
 entre distribución de teclado, la interfaz y atajos de teclado.
 
-https://user-images.githubusercontent.com/22999877/224569790-4eaefcec-d32c-4ca5-86df-aa46882bb8ff.mp4
+https://github.com/pinguin-frosch/swirl/assets/22999877/aa9debc9-eeb5-4b5d-ad1c-66b98f72e8be
 
 ## Funcionamiento
 El programa lee un archivo de configuración para determinar qué comandos
