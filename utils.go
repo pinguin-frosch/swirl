@@ -74,6 +74,39 @@ func replaceVariables(cmdString string, variables map[string]interface{}) string
 	return cmdString
 }
 
+func replaceDotVariables(path string, variables Variable) (string, error) {
+	// Chop prefixes until there are no more dots
+	current := variables
+	for strings.Contains(path, ".") {
+		// Get current iteration prefix
+		prefix := path[:strings.Index(path, ".")]
+		prefixDot := fmt.Sprintf("%s.", prefix)
+
+		// Descend to the next level using the prefix
+		next, ok := current.GoDown(prefix)
+		if !ok {
+			return "", fmt.Errorf("Couldn't go down to %v", prefix)
+		}
+
+		// Update the variable and remove the prefix from the path
+		path = strings.TrimPrefix(path, prefixDot)
+		current = next
+	}
+
+	if path == "" {
+		return "", fmt.Errorf("Invalid dot at the end of string")
+	}
+
+	// Get the final final
+	value, ok := current.GetValue(path)
+	if !ok {
+		fmt.Printf("Got an error while getting the value\n")
+		return "", fmt.Errorf("Couldn't get value %v", path)
+	}
+
+	return value, nil
+}
+
 func parseCommandString(cmdString string) []string {
 	// Array of string slices to hold the command and args
 	cmdArgs := []string{}
