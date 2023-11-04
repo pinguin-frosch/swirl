@@ -36,11 +36,26 @@ func runAppCommands(apps []Application, swirlVariables *SwirlVariables, message 
 
 		// Parse commands and run them
 		for _, command := range app.Commands {
-			command = replaceVariables(command, variables)
+			command = replacePercentVariables(command, variables)
 			cmdArgs = parseCommandString(command)
 			runCommand(cmdArgs)
 		}
 	}
+}
+
+func replaceVariables(cmdString string, variables Variable) string {
+	cmdString = replacePercentVariables(cmdString, variables)
+	dotVariables := findDotVariables(cmdString)
+	for _, dot := range dotVariables {
+		key := strings.TrimPrefix(dot, "%")
+		key = strings.TrimSuffix(key, "%")
+		value, err := replaceDotVariables(key, variables)
+		if err != nil {
+			continue
+		}
+		cmdString = strings.ReplaceAll(cmdString, dot, value)
+	}
+	return cmdString
 }
 
 // Finds the chuncks in the cmd that have valid dot variables.
@@ -87,7 +102,7 @@ func isValidKey(c rune) bool {
 	return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_' || c == '.'
 }
 
-func replaceVariables(cmdString string, variables map[string]interface{}) string {
+func replacePercentVariables(cmdString string, variables map[string]interface{}) string {
 	// Loop over variables map and replace them in the cmdString
 	for {
 		replaced := false
