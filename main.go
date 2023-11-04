@@ -35,7 +35,8 @@ func main() {
 
 	// Invert background when no args are provided
 	if len(args) == 0 {
-		if background, ok := (*globalVariables)["background"]; ok {
+		background, ok := globalVariables.GetValue("background")
+		if ok {
 			if background == "dark" {
 				args["background"] = "light"
 			} else {
